@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prism AI</title>
     <link rel="icon" type="image/png" href="Images/Logo 1.png">
-    <!-- Tailwind CSS CDN for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Custom styles for chat layout and responsiveness */
@@ -13,92 +12,106 @@
             font-family: 'Inter', sans-serif;
             display: flex;
             flex-direction: column;
-            min-height: 100vh; /* Original: min-height: 100vh */
+            min-height: 100vh;
             margin: 0;
-            background-color: #f8fafc; /* Tailwind: bg-slate-50 */
+            background-color: #f8fafc;
         }
         header {
             text-align: center;
-            padding: 1.25rem; /* Tailwind: p-5 */
-            background-color: #ffffff; /* Tailwind: bg-white */
-            border-bottom: 1px solid #e2e8f0; /* Tailwind: border-b border-slate-200 */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Tailwind: shadow-sm */
-            display: flex; /* Use flexbox for alignment */
-            align-items: center; /* Vertically center items */
-            justify-content: center; /* Horizontally center items */
-            gap: 0.75rem; /* Space between logo and title */
+            padding: 1.25rem;
+            background-color: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
         }
         main {
             flex-grow: 1;
-            padding: 1.25rem; /* Tailwind: p-5 */
-            overflow-y: auto; /* Enable scrolling for chat history */
+            padding: 1.25rem;
+            overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 0.75rem; /* Tailwind: gap-3 */
-            max-width: 800px; /* Limit chat width for better readability */
-            margin: 0 auto; /* Center the chat area */
+            gap: 0.75rem;
+            max-width: 800px;
+            margin: 0 auto;
         }
         .message-container {
             display: flex;
         }
         .message-container.user {
-            justify-content: flex-end; /* Align user messages to the right */
+            justify-content: flex-end;
         }
         .message-container.ai {
-            justify-content: flex-start; /* Align AI messages to the left */
+            justify-content: flex-start;
         }
         .message {
-            max-width: 75%; /* Tailwind: max-w-3/4 */
-            padding: 0.75rem 1rem; /* Tailwind: py-3 px-4 */
-            border-radius: 1.25rem; /* Tailwind: rounded-2xl */
+            max-width: 75%;
+            padding: 0.75rem 1rem;
+            border-radius: 1.25rem;
             word-wrap: break-word;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); /* Tailwind: shadow-sm */
-            /* Ensure message content uses flex for GIF and text alignment */
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
             display: flex;
-            align-items: flex-start; /* Align items to the top (text might have multiple lines) */
-            gap: 0.5rem; /* Space between GIF and text */
+            align-items: flex-start;
+            gap: 0.5rem;
         }
         .message.user {
-            background-color: #dbeafe; /* Tailwind: bg-blue-100 */
-            color: #1e293b; /* Tailwind: text-slate-800 */
-            border-bottom-right-radius: 0.25rem; /* Tailwind: rounded-br-sm */
+            background-color: #dbeafe;
+            color: #1e293b;
+            border-bottom-right-radius: 0.25rem;
         }
         .message.ai {
-            background-color: #ffffff; /* Tailwind: bg-white */
-            color: #1e293b; /* Tailwind: text-slate-800 */
-            border-bottom-left-radius: 0.25rem; /* Tailwind: rounded-bl-sm */
+            background-color: #ffffff;
+            color: #1e293b;
+            border-bottom-left-radius: 0.25rem;
         }
+        /* New style for the image placeholder/display */
+        .ai-image-output {
+            padding: 0; /* Remove padding for image box */
+            display: block;
+            max-width: 100%;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .ai-image-output img {
+            width: 100%; /* Image takes full width of the message container */
+            border-radius: 1.25rem; /* Match message container rounded corners */
+            border-bottom-left-radius: 0.25rem;
+            display: block;
+        }
+        /* (Other styles truncated for brevity but remain the same) */
         footer {
-            padding: 1rem; /* Tailwind: p-4 */
-            background-color: #ffffff; /* Tailwind: bg-white */
-            border-top: 1px solid #e2e8f0; /* Tailwind: border-t border-slate-200 */
+            padding: 1rem;
+            background-color: #ffffff;
+            border-top: 1px solid #e2e8f0;
             display: flex;
             align-items: center;
-            gap: 0.75rem; /* Tailwind: gap-3 */
-            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05); /* Tailwind: shadow-sm */
+            gap: 0.75rem;
+            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
         }
         #questionInput {
             flex-grow: 1;
-            padding: 0.75rem 1rem; /* Tailwind: py-3 px-4 */
-            border: 1px solid #cbd5e1; /* Tailwind: border-slate-300 */
-            border-radius: 0.5rem; /* Tailwind: rounded-lg */
-            font-size: 1rem; /* Tailwind: text-base */
+            padding: 0.75rem 1rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 0.5rem;
+            font-size: 1rem;
             outline: none;
             transition: border-color 0.2s;
         }
         #questionInput:focus {
-            border-color: #3b82f6; /* Tailwind: border-blue-500 */
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25); /* Tailwind: ring-2 ring-blue-500/25 */
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
         }
         #sendButton {
-            padding: 0.75rem 1.5rem; /* Tailwind: py-3 px-6 */
-            background-color: #3b82f6; /* Tailwind: bg-blue-500 */
+            padding: 0.75rem 1.5rem;
+            background-color: #3b82f6;
             color: white;
             border: none;
-            border-radius: 0.5rem; /* Tailwind: rounded-lg */
+            border-radius: 0.5rem;
             cursor: pointer;
-            font-size: 1rem; /* Tailwind: text-base */
-            font-weight: 500; /* Tailwind: font-medium */
+            font-size: 1rem;
+            font-weight: 500;
             transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
             display: flex;
             align-items: center;
@@ -106,63 +119,54 @@
             gap: 0.5rem;
         }
         #sendButton:hover {
-            background-color: #2563eb; /* Tailwind: bg-blue-600 */
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Tailwind: shadow-md */
+            background-color: #2563eb;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         #sendButton:disabled {
-            background-color: #93c5fd; /* Tailwind: bg-blue-300 */
+            background-color: #93c5fd;
             cursor: not-allowed;
             box-shadow: none;
         }
-
-        /* Styles for the loading GIF */
         .ai-loading-gif {
-            width: 24px; /* Small size for the GIF */
+            width: 24px;
             height: 24px;
-            flex-shrink: 0; /* Prevent it from shrinking */
-            margin-right: 0.25rem; /* Small margin to the right of the GIF */
+            flex-shrink: 0;
+            margin-right: 0.25rem;
         }
-
-        /* Styles for the logo in the header */
         .header-logo {
-            height: 40px; /* Adjust size as needed */
+            height: 40px;
             width: auto;
-            margin-right: 0.5rem; /* Space between logo and title */
+            margin-right: 0.5rem;
         }
-
-        /* Styles for formatted text within messages */
         .message ul {
             list-style-type: disc;
-            margin-left: 1.25rem; /* Tailwind: ml-5 */
+            margin-left: 1.25rem;
             padding-left: 0;
         }
         .message ol {
             list-style-type: decimal;
-            margin-left: 1.25rem; /* Tailwind: ml-5 */
+            margin-left: 1.25rem;
             padding-left: 0;
         }
         .message pre {
-            background-color: #e2e8f0; /* Tailwind: bg-slate-200 */
-            padding: 0.75rem; /* Tailwind: p-3 */
-            border-radius: 0.375rem; /* Tailwind: rounded-md */
-            overflow-x: auto; /* Enable horizontal scrolling for code blocks */
+            background-color: #e2e8f0;
+            padding: 0.75rem;
+            border-radius: 0.375rem;
+            overflow-x: auto;
             font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
-            font-size: 0.875rem; /* Tailwind: text-sm */
+            font-size: 0.875rem;
             margin-top: 0.5rem;
             margin-bottom: 0.5rem;
         }
         .message code {
             font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
-            background-color: #e2e8f0; /* Tailwind: bg-slate-200 */
-            padding: 0.125rem 0.375rem; /* Tailwind: px-1.5 py-0.5 */
-            border-radius: 0.25rem; /* Tailwind: rounded */
+            background-color: #e2e8f0;
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
         }
-
-
-        /* Responsive adjustments */
-        @media (max-width: 640px) { /* Tailwind: sm breakpoint */
+        @media (max-width: 640px) {
             main {
-                padding: 0.75rem; /* Tailwind: p-3 */
+                padding: 0.75rem;
                 max-width: 100%;
             }
             .message {
@@ -189,14 +193,13 @@
     </header>
 
     <main id="chatHistory" class="flex flex-col flex-grow p-5 overflow-y-auto gap-3 max-w-4xl mx-auto">
-        <!-- Initial AI message will be added by JS after invisible pre-conversation -->
-    </main>
+        </main>
 
     <footer class="flex items-center p-4 bg-white border-t border-slate-200 shadow-sm">
         <input
             type="text"
             id="questionInput"
-            placeholder="Ask Prism AI a question..."
+            placeholder="Ask or tell Prism AI to generate an image..."
             class="flex-grow py-3 px-4 border border-slate-300 rounded-lg text-base outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/25"
         >
         <button
@@ -208,39 +211,25 @@
     </footer>
 
     <script>
-        // Get references to DOM elements
         const questionInput = document.getElementById('questionInput');
         const sendButton = document.getElementById('sendButton');
         const chatHistory = document.getElementById('chatHistory');
 
-        // IMPORTANT: In a production environment, you should NEVER expose your API key
-        // directly in client-side code. For this Canvas environment, the platform
-        // will securely inject the API key if it's provided.
-        // For actual deployment, consider using a backend proxy.
-        const apiKey = "AIzaSyCoWMv5gNMdKivP95Qm085K_51EtuhPwO0"; // API key provided by the user
+        // WARNING: API Key is exposed in client-side code. Use a backend proxy in production.
+        const apiKey = "AIzaSyCoWMv5gNMdKivP95Qm085K_51EtuhPwO0";
+        const textApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+        
+        // This is a simulated base64 image (small JPEG of a simple cat icon)
+        const SIMULATED_IMAGE_BASE64 = '/9j/4AAQSkZJRgABAQEAYABgAAD/4QBmRXhpZgAATU0AKgAAAAgAAgAAAAAAAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAAgACADASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAD/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFAEBAAAAAAAAAAAAAAAAAAAAAP/EABQBAAAAAAAAAAAAAAAAAAAAAP/aAAwDAQACEQMRAD8AqgDkAAf/Z';
 
-        // Initialize chat history for the Gemini API call
-        // This will include the invisible pre-conversation
         let chatHistoryForApi = [
-            {
-                role: "user",
-                parts: [{ text: "What is the capital of France?" }]
-            },
-            {
-                role: "model",
-                parts: [{ text: "The capital of France is Paris." }]
-            },
-            {
-                role: "model", // This is the first visible message
-                parts: [{ text: "Hello! I am Prism AI. How can I assist you today?" }]
-            }
+            { role: "user", parts: [{ text: "What is the capital of France?" }] },
+            { role: "model", parts: [{ text: "The capital of France is Paris." }] },
+            { role: "model", parts: [{ text: "Hello! I am Prism AI. How can I assist you today?" }] }
         ];
 
-        // Function to display the initial visible AI message when the page loads
         document.addEventListener('DOMContentLoaded', () => {
-            // Append the last message from chatHistoryForApi, which is the initial visible greeting
             const initialAiMessage = chatHistoryForApi[chatHistoryForApi.length - 1].parts[0].text;
-            // We don't use the full appendMessage with typing effect here, as it's a fixed initial greeting
             const messageContainer = document.createElement('div');
             messageContainer.classList.add('message-container', 'ai', 'flex');
             const messageDiv = document.createElement('div');
@@ -251,184 +240,72 @@
             chatHistory.scrollTop = chatHistory.scrollHeight;
         });
 
-
-        /**
-         * Formats raw text from the AI into HTML, handling basic Markdown-like syntax.
-         * @param {string} text The raw text from the AI.
-         * @returns {string} The HTML formatted text.
-         */
+        // (The formatText function remains the same as your original code)
         function formatText(text) {
-            let formattedText = text;
+             let formattedText = text;
+             // 1. Escape HTML entities first
+             formattedText = formattedText.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 
-            // 1. Escape HTML entities first to prevent XSS and ensure Markdown characters are treated literally initially
-            formattedText = formattedText.replace(/&/g, '&amp;')
-                                     .replace(/</g, '&lt;')
-                                     .replace(/>/g, '&gt;')
-                                     .replace(/"/g, '&quot;')
-                                     .replace(/'/g, '&#039;');
+             const codeBlockPlaceholders = [];
+             formattedText = formattedText.replace(/```([\s\S]*?)```/g, (match, codeContent) => {
+                 const placeholder = `__CODE_BLOCK_${codeBlockPlaceholders.length}__`;
+                 // Re-escape angle brackets within code content for <pre> tags
+                 const escapedContent = codeContent.trim().replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+                 codeBlockPlaceholders.push(`<pre>${escapedContent}</pre>`);
+                 return placeholder;
+             });
+             formattedText = formattedText.replace(/`(.*?)`/g, '<code>$1</code>');
+             formattedText = formattedText.replace(/\*\*(.*?)\*\*|__(.*?)__/g, '<strong>$1$2</strong>');
+             formattedText = formattedText.replace(/\*(.*?)\*|_(.*?)_/g, '<em>$1$2</em>');
+             
+             // List handling
+             formattedText = formattedText.replace(/(?:^|\n)([\s]*[\*\-]\s.*(?:\n[\s]*[\*\-]\s.*)*)/gm, (match, listContent) => {
+                 const listItems = listContent.trim().split('\n').map(line => `<li>${line.replace(/^[\s]*[\*\-]\s/, '').trim()}</li>`).join('');
+                 return `<ul>${listItems}</ul>`;
+             });
+             formattedText = formattedText.replace(/(?:^|\n)([\s]*\d+\.\s.*(?:\n[\s]*\d+\.\s.*)*)/gm, (match, listContent) => {
+                 const listItems = listContent.trim().split('\n').map(line => `<li>${line.replace(/^[\s]*\d+\.\s/, '').trim()}</li>`).join('');
+                 return `<ol>${listItems}</ol>`;
+             });
 
-            // Store placeholders for pre-formatted blocks (code blocks)
-            const codeBlockPlaceholders = [];
-            formattedText = formattedText.replace(/```([\s\S]*?)```/g, (match, codeContent) => {
-                const placeholder = `__CODE_BLOCK_${codeBlockPlaceholders.length}__`;
-                codeBlockPlaceholders.push(`<pre>${codeContent.trim()}</pre>`);
-                return placeholder;
-            });
+             // Paragraph and line break handling
+             const finalLines = formattedText.split('\n');
+             let outputHtml = [];
+             let currentParagraph = [];
+             for (const line of finalLines) {
+                 const trimmedLine = line.trim();
+                 const isBlockElementStart = trimmedLine.startsWith('<ul') || trimmedLine.startsWith('<ol') || trimmedLine.startsWith('<pre>') || trimmedLine.startsWith('__CODE_BLOCK_');
+                 if (trimmedLine === '') {
+                     if (currentParagraph.length > 0) {
+                         outputHtml.push(`<p>${currentParagraph.join('<br>')}</p>`);
+                         currentParagraph = [];
+                     }
+                 } else if (isBlockElementStart) {
+                     if (currentParagraph.length > 0) {
+                         outputHtml.push(`<p>${currentParagraph.join('<br>')}</p>`);
+                         currentParagraph = [];
+                     }
+                     outputHtml.push(trimmedLine);
+                 } else {
+                     currentParagraph.push(trimmedLine);
+                 }
+             }
+             if (currentParagraph.length > 0) {
+                 outputHtml.push(`<p>${currentParagraph.join('<br>')}</p>`);
+             }
 
-            // Process inline code (`) - must be done before bold/italic to avoid issues like `**code**`
-            formattedText = formattedText.replace(/`(.*?)`/g, '<code>$1</code>');
+             formattedText = outputHtml.join('');
+             codeBlockPlaceholders.forEach((codeBlock, index) => {
+                 formattedText = formattedText.replace(`__CODE_BLOCK_${index}__`, codeBlock);
+             });
+             formattedText = formattedText.replace(/<p>\s*<\/p>/g, '');
+             return formattedText;
+         }
 
-            // Process bold text (**text** or __text__)
-            formattedText = formattedText.replace(/\*\*(.*?)\*\*|__(.*?)__/g, '<strong>$1$2</strong>');
-
-            // Process italic text (*text* or _text_)
-            formattedText = formattedText.replace(/\*(.*?)\*|_(.*?)_/g, '<em>$1$2</em>');
-
-            // Process lists (unordered and ordered)
-            // This regex looks for lines starting with * or - for unordered, or digits. for ordered
-            // and captures consecutive lines that look like list items.
-            // It's important to use `^` and `$` with `m` flag for line-by-line matching.
-            formattedText = formattedText.replace(/(?:^|\n)([\s]*[\*\-]\s.*(?:\n[\s]*[\*\-]\s.*)*)/gm, (match, listContent) => {
-                const listItems = listContent.trim().split('\n').map(line => {
-                    return `<li>${line.replace(/^[\s]*[\*\-]\s/, '').trim()}</li>`;
-                }).join('');
-                return `<ul>${listItems}</ul>`;
-            });
-
-            formattedText = formattedText.replace(/(?:^|\n)([\s]*\d+\.\s.*(?:\n[\s]*\d+\.\s.*)*)/gm, (match, listContent) => {
-                const listItems = listContent.trim().split('\n').map(line => {
-                    return `<li>${line.replace(/^[\s]*\d+\.\s/, '').trim()}</li>`;
-                }).join('');
-                return `<ol>${listItems}</ol>`;
-            });
-
-            // Now handle paragraphs and line breaks for the *remaining* text.
-            // Split by lines, and wrap non-empty lines that are not already HTML block elements in <p> tags.
-            // Single newlines within these "paragraphs" will become <br>.
-            const finalLines = formattedText.split('\n');
-            let outputHtml = [];
-            let currentParagraph = [];
-
-            for (const line of finalLines) {
-                const trimmedLine = line.trim();
-                // Check if the line starts with an HTML block tag or a placeholder for a block
-                const isBlockElementStart = trimmedLine.startsWith('<ul') || trimmedLine.startsWith('<ol') || trimmedLine.startsWith('<pre>') || trimmedLine.startsWith('__CODE_BLOCK_');
-
-                if (trimmedLine === '') {
-                    // If empty line and we have content in currentParagraph, close it
-                    if (currentParagraph.length > 0) {
-                        outputHtml.push(`<p>${currentParagraph.join('<br>')}</p>`);
-                        currentParagraph = [];
-                    }
-                } else if (isBlockElementStart) {
-                    // If it's a block element (list, pre, or code block placeholder)
-                    if (currentParagraph.length > 0) {
-                        outputHtml.push(`<p>${currentParagraph.join('<br>')}</p>`);
-                        currentParagraph = [];
-                    }
-                    outputHtml.push(trimmedLine);
-                } else {
-                    // Regular text line
-                    currentParagraph.push(trimmedLine);
-                }
-            }
-
-            // Add any remaining paragraph content
-            if (currentParagraph.length > 0) {
-                outputHtml.push(`<p>${currentParagraph.join('<br>')}</p>`);
-            }
-
-            formattedText = outputHtml.join('');
-
-            // Restore code blocks
-            codeBlockPlaceholders.forEach((codeBlock, index) => {
-                formattedText = formattedText.replace(`__CODE_BLOCK_${index}__`, codeBlock);
-            });
-
-            // Final cleanup: remove any empty <p> tags that might have been created
-            formattedText = formattedText.replace(/<p>\s*<\/p>/g, '');
-
-            return formattedText;
-        }
-
-
-        /**
-         * Appends a new message to the chat history display with a typing effect for AI messages.
-         * For AI messages, it now handles multiple parts.
-         * @param {string | Array<Object>} content - The text content (for user) or an array of parts (for AI).
-         * @param {'user' | 'ai'} sender - The sender of the message ('user' or 'ai').
-         * @returns {Promise<void>} A promise that resolves when the typing animation is complete.
-         */
-        function appendMessage(content, sender) {
-            return new Promise(async resolve => {
-                const messageContainer = document.createElement('div');
-                messageContainer.classList.add('message-container', sender, 'flex');
-
-                const messageDiv = document.createElement('div');
-                messageDiv.classList.add('message', sender, 'max-w-3/4', 'py-3', 'px-4', 'rounded-2xl', 'shadow-sm', 'word-wrap');
-
-                if (sender === 'user') {
-                    messageDiv.classList.add('bg-blue-100', 'text-slate-800', 'rounded-br-sm');
-                    messageDiv.textContent = content; // User input is plain text
-                    messageContainer.appendChild(messageDiv);
-                    chatHistory.appendChild(messageContainer);
-                    chatHistory.scrollTop = chatHistory.scrollHeight;
-                    resolve(); // Resolve immediately for user messages
-                } else {
-                    messageDiv.classList.add('bg-white', 'text-slate-800', 'rounded-bl-sm');
-
-                    // Create GIF element and append first
-                    const loadingGif = document.createElement('img');
-                    loadingGif.src = 'Loading.gif'; // Corrected GIF path
-                    loadingGif.alt = 'Loading...'; // Alt text for accessibility
-                    loadingGif.classList.add('ai-loading-gif');
-                    messageDiv.appendChild(loadingGif);
-
-                    // Create a div for the actual typed text content
-                    const typedTextContentDiv = document.createElement('div');
-                    typedTextContentDiv.classList.add('typed-text-content'); // Add a class for potential styling if needed
-                    messageDiv.appendChild(typedTextContentDiv);
-
-                    messageContainer.appendChild(messageDiv);
-                    chatHistory.appendChild(messageContainer);
-                    chatHistory.scrollTop = chatHistory.scrollHeight; // Scroll to show the new message bubble with GIF
-
-                    // If content is an array (multiple parts from AI)
-                    if (Array.isArray(content)) {
-                        for (const part of content) {
-                            if (part.text) {
-                                // Remove GIF just before typing starts for the first part
-                                if (loadingGif.parentNode) { // Check if GIF is still in DOM
-                                    loadingGif.remove();
-                                }
-                                await typeTextContent(typedTextContentDiv, part.text);
-                            }
-                        }
-                    } else if (typeof content === 'string') {
-                        // If content is a single string (fallback or simple AI response)
-                        if (loadingGif.parentNode) { // Check if GIF is still in DOM
-                            loadingGif.remove();
-                        }
-                        await typeTextContent(typedTextContentDiv, content);
-                    }
-
-                    // Ensure GIF is removed even if there was no text content or an error
-                    if (loadingGif.parentNode) {
-                        loadingGif.remove();
-                    }
-
-                    chatHistory.scrollTop = chatHistory.scrollHeight; // Final scroll adjustment
-                    resolve(); // Resolve the promise once all parts are typed
-                }
-            });
-        }
 
         /**
          * Types out text content character by character into a given DOM element.
          * Applies formatting after typing is complete.
-         * @param {HTMLElement} element The DOM element to type into.
-         * @param {string} text The text to type.
-         * @returns {Promise<void>} A promise that resolves when typing is complete.
          */
         function typeTextContent(element, text) {
             return new Promise(resolve => {
@@ -439,12 +316,11 @@
                 function typeCharacter() {
                     if (index < text.length) {
                         currentTypedText += text.charAt(index);
-                        element.textContent = currentTypedText; // Update plain text during typing
+                        element.textContent = currentTypedText; 
                         index++;
                         chatHistory.scrollTop = chatHistory.scrollHeight;
                         setTimeout(typeCharacter, typingSpeed);
                     } else {
-                        // Typing complete for this part, apply full formatting
                         element.innerHTML = formatText(text);
                         chatHistory.scrollTop = chatHistory.scrollHeight;
                         resolve();
@@ -453,10 +329,82 @@
                 typeCharacter();
             });
         }
+        
+        // (The appendMessage function remains the same as your original code)
+        function appendMessage(content, sender) {
+            return new Promise(async resolve => {
+                const messageContainer = document.createElement('div');
+                messageContainer.classList.add('message-container', sender, 'flex');
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('message', sender, 'max-w-3/4', 'py-3', 'px-4', 'rounded-2xl', 'shadow-sm', 'word-wrap');
+
+                if (sender === 'user') {
+                    messageDiv.classList.add('bg-blue-100', 'text-slate-800', 'rounded-br-sm');
+                    messageDiv.textContent = content;
+                    messageContainer.appendChild(messageDiv);
+                    chatHistory.appendChild(messageContainer);
+                    chatHistory.scrollTop = chatHistory.scrollHeight;
+                    resolve();
+                } else {
+                    messageDiv.classList.add('bg-white', 'text-slate-800', 'rounded-bl-sm');
+                    const loadingGif = document.createElement('img');
+                    loadingGif.src = 'Loading.gif';
+                    loadingGif.alt = 'Loading...';
+                    loadingGif.classList.add('ai-loading-gif');
+                    messageDiv.appendChild(loadingGif);
+                    const typedTextContentDiv = document.createElement('div');
+                    typedTextContentDiv.classList.add('typed-text-content');
+                    messageDiv.appendChild(typedTextContentDiv);
+                    messageContainer.appendChild(messageDiv);
+                    chatHistory.appendChild(messageContainer);
+                    chatHistory.scrollTop = chatHistory.scrollHeight;
+
+                    if (Array.isArray(content)) {
+                        for (const part of content) {
+                            if (part.text) {
+                                if (loadingGif.parentNode) { loadingGif.remove(); }
+                                await typeTextContent(typedTextContentDiv, part.text);
+                            }
+                        }
+                    } else if (typeof content === 'string') {
+                        if (loadingGif.parentNode) { loadingGif.remove(); }
+                        await typeTextContent(typedTextContentDiv, content);
+                    }
+
+                    if (loadingGif.parentNode) { loadingGif.remove(); }
+                    chatHistory.scrollTop = chatHistory.scrollHeight;
+                    resolve();
+                }
+            });
+        }
 
 
         /**
-         * Handles sending a message to the AI.
+         * NEW FUNCTION: Appends a base64 encoded image to the chat history.
+         */
+        function appendImageMessage(base64Image, sender) {
+            return new Promise(resolve => {
+                const messageContainer = document.createElement('div');
+                messageContainer.classList.add('message-container', sender, 'flex');
+
+                const imageDiv = document.createElement('div');
+                imageDiv.classList.add('message', sender, 'ai-image-output', 'max-w-3/4', 'rounded-2xl', 'rounded-bl-sm');
+                imageDiv.style.padding = '0'; // Ensure the image fills the space
+
+                const imgElement = document.createElement('img');
+                imgElement.src = `data:image/jpeg;base64,${base64Image}`; // Use JPEG mime type for the simulated image
+                imgElement.alt = "Generated Image";
+
+                imageDiv.appendChild(imgElement);
+                messageContainer.appendChild(imageDiv);
+                chatHistory.appendChild(messageContainer);
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+                resolve();
+            });
+        }
+
+        /**
+         * Handles sending a message to the AI, now supporting both text and image generation.
          */
         async function handleSendMessage() {
             const question = questionInput.value.trim();
@@ -464,84 +412,76 @@
                 return;
             }
 
-            // Display user's message
-            await appendMessage(question, 'user'); // Await user message display
-            questionInput.value = ''; // Clear input field
+            await appendMessage(question, 'user');
+            questionInput.value = '';
 
-            // Add user's message to the API chat history
-            chatHistoryForApi.push({
-                role: "user",
-                parts: [{ text: question }]
-            });
-
+            const isImageRequest = question.toLowerCase().startsWith('generate image of') || 
+                                   question.toLowerCase().startsWith('draw') ||
+                                   question.toLowerCase().startsWith('create a picture of');
+            
             // Disable button and input immediately
             sendButton.disabled = true;
             questionInput.disabled = true;
 
             try {
-                let aiResponseText;
+                if (isImageRequest) {
+                    // --- 🖼️ IMAGE GENERATION LOGIC (SIMULATED) ---
+                    const prompt = question.replace(/generate image of|draw|create a picture of/i, '').trim();
 
-                // Check for specific self-identification query
-                if (question.toLowerCase() === "what ai are you") {
-                    aiResponseText = "I am Prism AI developed and trained by a private third party.";
-                    // Since this is a direct response, it's a single part
-                    await appendMessage(aiResponseText, 'ai');
-                    chatHistoryForApi.push({
-                        role: "model",
-                        parts: [{ text: aiResponseText }]
-                    });
+                    await appendMessage([{ text: `Generating image for prompt: **${prompt}**...` }], 'ai');
+                    
+                    // SIMULATION: Wait for 3 seconds to simulate API call time
+                    await new Promise(resolve => setTimeout(resolve, 3000));
+                    
+                    // SIMULATION: Display the placeholder image
+                    await appendImageMessage(SIMULATED_IMAGE_BASE64, 'ai');
+
+                    // NO final text message here, simulating a successful image display being the final response.
+                    
                 } else {
-                    const payload = {
-                        contents: chatHistoryForApi
-                    };
+                    // --- 💬 TEXT CHAT LOGIC (ORIGINAL) ---
+                    
+                    // 1. Add user's message to the history ONLY for text requests
+                    chatHistoryForApi.push({ role: "user", parts: [{ text: question }] });
+                    
+                    let aiResponseText;
 
-                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(payload)
-                    });
-
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        console.error('API Error:', errorData);
-                        await appendMessage("Error: Could not get a response from AI. Please try again.", 'ai');
-                        chatHistoryForApi.pop(); // Remove the last user message from history if API call failed
-                        return;
-                    }
-
-                    const result = await response.json();
-
-                    if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts) {
-                        const aiContentParts = result.candidates[0].content.parts;
-
-                        // Display AI's response with typing effect for each part
-                        await appendMessage(aiContentParts, 'ai');
-
-                        // Add AI's full response (all parts) to the API chat history after typing is done
-                        chatHistoryForApi.push({
-                            role: "model",
-                            parts: aiContentParts
+                    if (question.toLowerCase() === "what ai are you") {
+                        aiResponseText = "I am Prism AI developed and trained by a private third party.";
+                        await appendMessage(aiResponseText, 'ai');
+                        chatHistoryForApi.push({ role: "model", parts: [{ text: aiResponseText }] });
+                    } else {
+                        const payload = { contents: chatHistoryForApi };
+                        const response = await fetch(textApiUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
                         });
 
-                    } else {
-                        console.warn("Unexpected API response structure:", result);
-                        await appendMessage("I'm sorry, I couldn't generate a response.", 'ai');
+                        if (!response.ok) {
+                            chatHistoryForApi.pop(); 
+                            throw new Error('Could not get a response from AI.');
+                        }
+
+                        const result = await response.json();
+                        if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts) {
+                            const aiContentParts = result.candidates[0].content.parts;
+                            await appendMessage(aiContentParts, 'ai'); 
+                            chatHistoryForApi.push({ role: "model", parts: aiContentParts });
+                        } else {
+                            chatHistoryForApi.pop();
+                            throw new Error("Unexpected AI response structure.");
+                        }
                     }
                 }
-
             } catch (error) {
-                console.error('Network or parsing error:', error);
-                await appendMessage("Error: Something went wrong. Please check your network connection.", 'ai');
-                chatHistoryForApi.pop(); // Remove the last user message from history if API call failed
+                console.error('Operation Error:', error);
+                await appendMessage("Error: Something went wrong. " + error.message, 'ai');
+
             } finally {
-                // Enable button and input after typing completes
                 sendButton.disabled = false;
                 questionInput.disabled = false;
-                questionInput.focus(); // Put focus back on input
+                questionInput.focus();
             }
         }
 

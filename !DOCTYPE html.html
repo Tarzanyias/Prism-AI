@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prism AI</title>
+    <!-- Setting the favicon to the requested path -->
+    <link rel="icon" type="image/png" href="Images/Logo.png">
+    <!-- Load Tailwind CSS from CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for chat layout and responsiveness */
+        body {
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f8fafc;
+        }
+
+        header {
+            text-align: center;
+            padding: 1.25rem;
+            background-color: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        main {
+            flex-grow: 1;
+            padding: 1.25rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .message-container {
+            display: flex;
+        }
+
+        .message-container.user {
+            justify-content: flex-end;
+        }
+
+        .message-container.ai {
+            justify-content: flex-start;
+        }
+
+        .message {
+            max-width: 75%;
+            padding: 0.75rem 1rem;
+            border-radius: 1.25rem;
+            word-wrap: break-word;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .message.user {
+            background-color: #dbeafe;
+            color: #1e293b;
+            border-bottom-right-radius: 0.25rem;
+        }
+
+        .message.ai {
+            background-color: #ffffff;
+            color: #1e293b;
+            border-bottom-left-radius: 0.25rem;
+        }
+
+        /* Style for the image container (which holds the image and the download button) */
+        .ai-image-output {
+            padding: 0; 
+            display: block;
+            max-width: 100%;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-radius: 1.25rem; /* Ensure the whole bubble is rounded */
+            border-bottom-left-radius: 0.25rem; /* Keep the conversation corner sharp */
+            overflow: hidden; /* important to contain the image */
+        }
+
+        .ai-image-output img {
+            width: 100%; 
+            height: auto;
+            display: block;
+        }
+
+        footer {
+            padding: 1rem;
+            background-color: #ffffff;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        #questionInput {
+            flex-grow: 1;
+            padding: 0.75rem 1rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        #questionInput:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+        }
+
+        #sendButton {
+            padding: 0.75rem 1.5rem;
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        #sendButton:hover {
+            background-color: #2563eb;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        #sendButton:disabled {
+            background-color: #93c5fd;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .header-logo {
+            height: 40px;
+            width: auto;
+            margin-right: 0.5rem;
+        }
+
+        .message ul {
+            list-style-type: disc;
+            margin-left: 1.25rem;
+            padding-left: 0;
+        }
+
+        .message ol {
+            list-style-type: decimal;
+            margin-left: 1.25rem;
+            padding-left: 0;
+        }
+
+        .message pre {
+            background-color: #e2e8f0;
+            padding: 0.75rem;
+            border-radius: 0.375rem;
+            overflow-x: auto;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .message code {
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+            background-color: #e2e8f0;
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+        }
+
+        @media (max-width: 640px) {
+            main {
+                padding: 0.75rem;
+                max-width: 100%;
+            }
+            .message {
+                max-width: 90%;
+            }
+            footer {
+                flex-direction: column;
+                padding: 0.75rem;
+                gap: 0.5rem;
+            }
+            #questionInput {
+                width: 100%;
+            }
+            #sendButton {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <!-- Setting the header logo source to the requested path -->
+        <img src="Images/Logo.png" alt="Prism AI Logo" class="header-logo">
+        <h1 class="text-3xl font-bold text-gray-800">Prism AI</h1>
+    </header>
+
+    <main id="chatHistory" class="flex flex-col flex-grow p-5 overflow-y-auto gap-3 max-w-4xl mx-auto">
+        <!-- Chat messages will be appended here -->
+    </main>
+
+    <footer class="flex items-center p-4 bg-white border-t border-slate-200 shadow-sm">
+        <input
+            type="text"
+            id="questionInput"
+            placeholder="Ask or tell Prism AI to generate an image..."
+            class="flex-grow py-3 px-4 border border-slate-300 rounded-lg text-base outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/25"
+        >
+        <button
+            id="sendButton"
+            class="py-3 px-6 bg-blue-500 text-white rounded-lg font-medium cursor-pointer transition-colors duration-200 hover:bg-blue-600 shadow-md disabled:bg-blue-300 disabled:cursor-not-allowed"
+        >
+            Send
+        </button>
+    </footer>
+
+    <script>
+        // *** API KEY MANAGEMENT - CRITICAL ***
+        // NOTE: This API key is used for both text and image generation calls.
+        const apiKey = "AIzaSyCoWMv5gNMdKivP95Qm085K_51EtuhPwO0"; 
+
+        const questionInput = document.getElementById('questionInput');
+        const sendButton = document.getElementById('sendButton');
+        const chatHistory = document.getElementById('chatHistory');
+
+        // Text API URL (for both chat and intent classification)
+        const textApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+
+        // Image Generation API URL (using gemini-2.5-flash-image-preview)
+        const imageApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${apiKey}`;
+
+        let chatHistoryForApi = [
+            { role: "user", parts: [{ text: "What is the capital of France?" }] },
+            { role: "model", parts: [{ text: "The capital of France is Paris." }] },
+            { role: "model", parts: [{ text: "Hello! I am Prism AI. I can answer your questions or generate images based on your descriptions. How can I assist you today?" }] }
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize the chat interface with the welcome message
+            const initialAiMessage = chatHistoryForApi[chatHistoryForApi.length - 1].parts[0].text;
+            const messageContainer = document.createElement('div');
+            messageContainer.classList.add('message-container', 'ai', 'flex');
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', 'ai', 'max-w-3/4', 'py-3', 'px-4', 'rounded-2xl', 'rounded-bl-sm', 'shadow-sm', 'word-wrap');
+            messageDiv.innerHTML = formatText(initialAiMessage);
+            messageContainer.appendChild(messageDiv);
+            chatHistory.appendChild(messageContainer);
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+
+            // Event listeners for sending messages are placed here for DOM readiness
+            sendButton.addEventListener('click', handleSendMessage);
+            questionInput.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    handleSendMessage();
+                }
+            });
+        });
+
+        /**
+         * Applies Markdown-like formatting to plain text.
+         */
+        function formatText(text) {
+             let formattedText = text;
+             // 1. Escape HTML entities first
+             formattedText = formattedText.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+
+             const codeBlockPlaceholders = [];
+             formattedText = formattedText.replace(/```([\s\S]*?)```/g, (match, codeContent) => {
+                 const placeholder = `__CODE_BLOCK_${codeBlockPlaceholders.length}__`;
+                 // Re-escape angle brackets within code content for <pre> tags
+                 const escapedContent = codeContent.trim().replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+                 codeBlockPlaceholders.push(`<pre>${escapedContent}</pre>`);
+                 return placeholder;
+             });
+             formattedText = formattedText.replace(/`(.*?)`/g, '<code>$1$2</code>');
+             formattedText = formattedText.replace(/\*\*(.*?)\*\*|__(.*?)__/g, '<strong>$1$2</strong>');
+             formattedText = formattedText.replace(/\*(.*?)\*|_(.*?)_/g, '<em>$1$2</em>');
+             
+             // List handling
+             formattedText = formattedText.replace(/(?:^|\n)([\s]*[\*\-]\s.*(?:\n[\s]*[\*\-]\s.*)*)/gm, (match, listContent) => {
+                 const listItems = listContent.trim().split('\n').map(line => `<li>${line.replace(/^[\s]*[\*\-]\s/, '').trim()}</li>`).join('');
+                 return `<ul>${listItems}</ul>`;
+             });
+             formattedText = formattedText.replace(/(?:^|\n)([\s]*\d+\.\s.*(?:\n[\s]*\d+\.\s.*)*)/gm, (match, listContent) => {
+                 const listItems = listContent.trim().split('\n').map(line => `<li>${line.replace(/^[\s]*\d+\.\s/, '').trim()}</li>`).join('');
+                 return `<ol>${listItems}</ol>`;
+             });
+
+             // Paragraph and line break handling
+             const finalLines = formattedText.split('\n');
+             let outputHtml = [];
+             let currentParagraph = [];
+             for (const line of finalLines) {
+                 const trimmedLine = line.trim();
+                 const isBlockElementStart = trimmedLine.startsWith('<ul') || trimmedLine.startsWith('<ol') || trimmedLine.startsWith('<pre>') || trimmedLine.startsWith('__CODE_BLOCK_');
+                 if (trimmedLine === '') {
+                     if (currentParagraph.length > 0) {
+                         outputHtml.push(`<p>${currentParagraph.join('<br>')}</p>`);
+                         currentParagraph = [];
+                     }
+                 } else if (isBlockElementStart) {
+                     if (currentParagraph.length > 0) {
+                         outputHtml.push(`<p>${currentParagraph.join('<br>')}</p>`);
+                         currentParagraph = [];
+                     }
+                     outputHtml.push(trimmedLine);
+                 } else {
+                     currentParagraph.push(trimmedLine);
+                 }
+             }
+             if (currentParagraph.length > 0) {
+                 outputHtml.push(`<p>${currentParagraph.join('<br>')}</p>`);
+             }
+
+             formattedText = outputHtml.join('');
+             codeBlockPlaceholders.forEach((codeBlock, index) => {
+                 formattedText = formattedText.replace(`__CODE_BLOCK_${index}__`, codeBlock);
+             });
+             formattedText = formattedText.replace(/<p>\s*<\/p>/g, '');
+             return formattedText;
+        }
+
+
+        /**
+         * Types out text content character by character into a given DOM element.
+         * Applies formatting after typing is complete.
+         */
+        function typeTextContent(element, text) {
+            return new Promise(resolve => {
+                let currentTypedText = '';
+                let index = 0;
+                const typingSpeed = 20; // milliseconds per character
+
+                function typeCharacter() {
+                    if (index < text.length) {
+                        currentTypedText += text.charAt(index);
+                        element.textContent = currentTypedText; 
+                        index++;
+                        chatHistory.scrollTop = chatHistory.scrollHeight;
+                        setTimeout(typeCharacter, typingSpeed);
+                    } else {
+                        element.innerHTML = formatText(text);
+                        chatHistory.scrollTop = chatHistory.scrollHeight;
+                        resolve();
+                    }
+                }
+                typeCharacter();
+            });
+        }
+
+        /**
+         * Appends a user or AI text message to the chat history with a typing effect for AI.
+         */
+        function appendMessage(content, sender) {
+            return new Promise(async resolve => {
+                const messageContainer = document.createElement('div');
+                messageContainer.classList.add('message-container', sender, 'flex');
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('message', sender, 'max-w-3/4', 'py-3', 'px-4', 'rounded-2xl', 'shadow-sm', 'word-wrap');
+
+                if (sender === 'user') {
+                    messageDiv.classList.add('bg-blue-100', 'text-slate-800', 'rounded-br-sm');
+                    messageDiv.textContent = content;
+                    messageContainer.appendChild(messageDiv);
+                    chatHistory.appendChild(messageContainer);
+                    chatHistory.scrollTop = chatHistory.scrollHeight;
+                    resolve(messageContainer);
+                } else {
+                    messageDiv.classList.add('bg-white', 'text-slate-800', 'rounded-bl-sm');
+                    // We use '...' as a simple loading indicator before typing starts
+                    messageDiv.textContent = '...'; 
+                    
+                    const typedTextContentDiv = document.createElement('div');
+                    typedTextContentDiv.classList.add('typed-text-content');
+                    
+                    messageContainer.appendChild(messageDiv);
+                    chatHistory.appendChild(messageContainer);
+                    chatHistory.scrollTop = chatHistory.scrollHeight;
+
+                    // Handle both Array of Parts and single string content
+                    let fullTextContent = "";
+                    if (Array.isArray(content)) {
+                        fullTextContent = content.map(part => part.text || '').join('');
+                    } else if (typeof content === 'string') {
+                        fullTextContent = content;
+                    }
+                    
+                    messageDiv.textContent = ''; // Clear '...'
+                    messageDiv.appendChild(typedTextContentDiv); // Append the typing container now
+                    await typeTextContent(typedTextContentDiv, fullTextContent);
+                    
+                    chatHistory.scrollTop = chatHistory.scrollHeight;
+                    resolve(messageContainer); // Resolve with the container for removal/reference
+                }
+            });
+        }
+
+
+        /**
+         * Appends a base64 encoded image to the chat history and includes a download button.
+         */
+        function appendImageMessage(base64Image, sender) {
+            return new Promise(resolve => {
+                const messageContainer = document.createElement('div');
+                messageContainer.classList.add('message-container', sender, 'flex');
+
+                const imageMessageDiv = document.createElement('div');
+                // Use custom CSS class for image bubble styling
+                imageMessageDiv.classList.add('message', sender, 'ai-image-output', 'max-w-3/4');
+                
+                const imageDataUri = `data:image/png;base64,${base64Image}`;
+
+                // 1. Image Element
+                const imgElement = document.createElement('img');
+                imgElement.src = imageDataUri; 
+                imgElement.alt = "Generated Image";
+                imgElement.classList.add('rounded-t-xl'); // Round top corners of the image
+                imageMessageDiv.appendChild(imgElement);
+
+                // 2. Download Button Container
+                const downloadContainer = document.createElement('div');
+                downloadContainer.classList.add('p-3', 'bg-slate-50', 'rounded-b-xl', 'border-t', 'border-slate-200', 'flex', 'justify-center');
+
+                // 3. Download Link/Button
+                // NOTE: SVG is INLINE, so no local file dependency here.
+                const downloadLink = document.createElement('a');
+                downloadLink.href = imageDataUri;
+                downloadLink.download = 'prism_ai_image.png'; // Suggested filename for download
+                // Inline SVG for the download icon (no external resource)
+                downloadLink.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L10 11.586l1.293-1.293a1 1 0 111.414 1.414l-2 2a1 1 0 01-1.414 0l-2-2a1 1 0 010-1.414z" clip-rule="evenodd" /><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v7a1 1 0 11-2 0V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>Download Image';
+                downloadLink.classList.add('inline-flex', 'items-center', 'justify-center', 'px-4', 'py-2', 'text-sm', 'font-medium', 'text-white', 'bg-green-600', 'rounded-lg', 'shadow-md', 'hover:bg-green-700', 'transition-colors');
+                
+                downloadContainer.appendChild(downloadLink);
+                imageMessageDiv.appendChild(downloadContainer); 
+
+                messageContainer.appendChild(imageMessageDiv);
+                chatHistory.appendChild(messageContainer);
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+                resolve();
+            });
+        }
+
+        /**
+         * Calls the Gemini API with structured output to classify the user's intent.
+         */
+        async function determineIntent(prompt) {
+            const systemPrompt = "Analyze the user's request. If the request is a direct instruction to create, draw, generate a picture, image, or photo, the intent is 'image_generation'. Otherwise, the intent is 'text_chat'. Only output the classification object.";
+
+            const intentPayload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "OBJECT",
+                        properties: {
+                            intent: { 
+                                type: "STRING", 
+                                description: "Must be 'text_chat' or 'image_generation'." 
+                            },
+                            image_prompt_suggestion: {
+                                type: "STRING",
+                                description: "If intent is 'image_generation', provide a clean, descriptive prompt suitable for an image generator. Otherwise, leave empty."
+                            }
+                        },
+                        required: ["intent"]
+                    }
+                }
+            };
+            
+            for (let attempt = 0; attempt < 3; attempt++) {
+                try {
+                    const response = await fetch(textApiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(intentPayload)
+                    });
+
+                    if (!response.ok) {
+                        const status = response.status;
+                        const statusText = response.statusText;
+                        let errorDetails = '';
+                        try { errorDetails = await response.text(); } catch (e) { errorDetails = 'No detailed error body available.'; }
+
+                        if (status === 429 && attempt < 2) {
+                            console.warn(`Rate limit exceeded (Attempt ${attempt + 1}). Retrying in ${Math.pow(2, attempt)}s...`);
+                            await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 1000));
+                            continue;
+                        }
+                        throw new Error(`Intent API Error: ${status} ${statusText}. Details: ${errorDetails}`);
+                    }
+
+                    const result = await response.json();
+                    
+                    if (result.candidates && result.candidates.length > 0 && 
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0) {
+                        
+                        const jsonText = result.candidates[0].content.parts[0].text;
+                        const parsedJson = JSON.parse(jsonText);
+                        return parsedJson;
+                    } else {
+                        throw new Error("Unexpected Intent API response structure.");
+                    }
+                } catch (error) {
+                    if (error.message.includes('Rate limit exceeded') && attempt < 2) continue;
+                    // If intent determination fails, default to text chat.
+                    return { intent: 'text_chat', image_prompt_suggestion: '' };
+                }
+            }
+        }
+
+
+        /**
+         * Calls the gemini-2.5-flash-image-preview API to generate an image.
+         */
+        async function generateImage(prompt) {
+            const imagePayload = {
+                contents: [{
+                    parts: [{ text: prompt }]
+                }],
+                generationConfig: {
+                    responseModalities: ['TEXT', 'IMAGE']
+                },
+            };
+            
+            // Implements exponential backoff for retries
+            for (let attempt = 0; attempt < 3; attempt++) {
+                try {
+                    const response = await fetch(imageApiUrl, { // Using the updated imageApiUrl
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(imagePayload)
+                    });
+
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        if (response.status === 429 && attempt < 2) {
+                             console.warn(`Rate limit exceeded (Attempt ${attempt + 1}). Retrying in ${Math.pow(2, attempt)}s...`);
+                            await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 1000));
+                            continue;
+                        }
+                        throw new Error(`Image API Error: ${response.status} ${response.statusText}. Details: ${errorText}`);
+                    }
+
+                    const result = await response.json();
+                    
+                    const base64Data = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
+                    
+                    if (base64Data) {
+                        return base64Data; // This is the base64 string
+                    } else {
+                        throw new Error("Unexpected Image API response structure or no image data found.");
+                    }
+                } catch (error) {
+                    if (error.message.includes('Rate limit exceeded') && attempt < 2) continue; // Handled by inner loop
+                    throw error;
+                }
+            }
+        }
+
+        /**
+         * Calls the Gemini Text API.
+         */
+        async function generateText(chatHistoryPayload) {
+            const payload = { contents: chatHistoryPayload };
+            
+            // Implements exponential backoff for retries
+            for (let attempt = 0; attempt < 3; attempt++) {
+                try {
+                    const response = await fetch(textApiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        const status = response.status;
+                        const statusText = response.statusText;
+                        let errorDetails = '';
+                        try {
+                            errorDetails = await response.text();
+                        } catch (e) {
+                            errorDetails = 'No detailed error body available.';
+                        }
+
+                        if (status === 429 && attempt < 2) {
+                            console.warn(`Rate limit exceeded (Attempt ${attempt + 1}). Retrying in ${Math.pow(2, attempt)}s...`);
+                            await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 1000));
+                            continue;
+                        }
+                        throw new Error(`Text API Error: ${status} ${statusText}. Details: ${errorDetails}`);
+                    }
+
+                    const result = await response.json();
+                    
+                    if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts) {
+                        return result.candidates[0].content.parts;
+                    } else {
+                        throw new Error("Unexpected AI response structure.");
+                    }
+                } catch (error) {
+                    if (error.message.includes('Rate limit exceeded') && attempt < 2) continue;
+                    throw error;
+                }
+            }
+        }
+
+        /**
+         * Handles sending a message to the AI, supporting both text and image generation.
+         */
+        async function handleSendMessage() {
+            const question = questionInput.value.trim();
+            if (!question) {
+                return;
+            }
+
+            await appendMessage(question, 'user');
+            questionInput.value = '';
+
+            // Disable button and input immediately
+            sendButton.disabled = true;
+            questionInput.disabled = true;
+
+            let loadingMessageContainer = null;
+            let intentResult = { intent: 'text_chat' }; // Default initialize
+
+            try {
+                // 1. Determine Intent
+                loadingMessageContainer = await appendMessage([{ text: "Analyzing intent..." }], 'ai');
+                intentResult = await determineIntent(question);
+                
+                // Remove the "Analyzing intent" message
+                if (loadingMessageContainer && loadingMessageContainer.parentNode) {
+                    chatHistory.removeChild(loadingMessageContainer); 
+                    loadingMessageContainer = null; 
+                }
+                
+                const intent = intentResult.intent;
+
+                if (intent === 'image_generation') {
+                    // --- 🖼️ IMAGE GENERATION LOGIC ---
+                    const prompt = intentResult.image_prompt_suggestion || question; 
+                    
+                    // Display a new loading message
+                    loadingMessageContainer = await appendMessage([{ text: `Generating image for prompt: **${prompt}** using **gemini-2.5-flash-image-preview**...` }], 'ai');
+                    
+                    // Call the Image Generation API
+                    const base64Image = await generateImage(prompt);
+                    
+                    // Remove the loading text message 
+                    if (loadingMessageContainer && loadingMessageContainer.parentNode) {
+                        chatHistory.removeChild(loadingMessageContainer); 
+                    }
+                    
+                    // Display the generated image and download link
+                    await appendImageMessage(base64Image, 'ai');
+                    
+                } else {
+                    // --- 💬 TEXT CHAT LOGIC ---
+                    
+                    // Display a new loading message for the text chat
+                    loadingMessageContainer = await appendMessage([{ text: "Thinking..." }], 'ai');
+                    
+                    // 2. Add user's message to the history and generate response
+                    chatHistoryForApi.push({ role: "user", parts: [{ text: question }] });
+                    const aiContentParts = await generateText(chatHistoryForApi);
+                    
+                    // Remove the "Thinking..." message
+                    if (loadingMessageContainer && loadingMessageContainer.parentNode) {
+                        chatHistory.removeChild(loadingMessageContainer); 
+                    }
+                    
+                    // 3. Append response and update history
+                    await appendMessage(aiContentParts, 'ai'); 
+                    chatHistoryForApi.push({ role: "model", parts: aiContentParts });
+                }
+            } catch (error) {
+                console.error('Operation Error:', error);
+                
+                // Remove user message from history if the API call failed (only for text chat)
+                if (intentResult.intent === 'text_chat') {
+                    // Find and remove the last user message from history if chat failed
+                    const lastUserIndex = chatHistoryForApi.map(msg => msg.role).lastIndexOf('user');
+                    if(lastUserIndex !== -1) {
+                         chatHistoryForApi.splice(lastUserIndex, 1);
+                    }
+                }
+
+                // Remove any active loading message
+                if (loadingMessageContainer && loadingMessageContainer.parentNode) {
+                    chatHistory.removeChild(loadingMessageContainer); 
+                }
+                
+                // Show final error message
+                await appendMessage(`Error: Could not complete the request. The Gemini API failed: ${error.message}. Please try again or ask for a text response instead.`, 'ai');
+
+            } finally {
+                sendButton.disabled = false;
+                questionInput.disabled = false;
+                questionInput.focus();
+            }
+        }
+    </script>
+</body>
+</html>
